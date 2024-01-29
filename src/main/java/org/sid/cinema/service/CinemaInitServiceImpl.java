@@ -73,7 +73,7 @@ public class CinemaInitServiceImpl implements ICinemaInitService {
 
 			 			Cinema cinema = new Cinema();
 			 			cinema.setName(name);
-			 			cinema.setNombreSalles(3);
+			 			cinema.setNombreSalles(n);
 			 			cinema.setVille(ville);
 			 			cinemaRep.save(cinema);			 			
 			 			}
@@ -88,11 +88,11 @@ public class CinemaInitServiceImpl implements ICinemaInitService {
 		cinemaRep.findAll()
 				.forEach(cinema->{
 					for(int i=1 ; i< cinema.getNombreSalles() ; i++) {
-						int nbrePlace = 30 + (int)(Math.random()*20) ;
+						int nbrePlace = 3 + (int)(Math.random()*20) ;
 						Salle salle = new Salle();
 						salle.setName("salle-"+i);
 						salle.setCinema(cinema);
-						salle.setNbrePlace(5);
+						salle.setNbrePlace(nbrePlace);
 						salleRep.save(salle);
 					}
 				});	
@@ -141,7 +141,7 @@ public class CinemaInitServiceImpl implements ICinemaInitService {
 	public void initFilms() {
 		double[] dures = new double[] {1,1.3 , 2,2.3} ;
 		List<Category> categories = categoryRep.findAll() ;
-		Stream.of("GOT" ,"suits","la casa","Choufli Hal","The Metalist").forEach(name->{
+		Stream.of("GOT" ,"suits","la casa","Choufli_Hal","Mentalist").forEach(name->{
 			int indexDure  = new Random().nextInt(dures.length);
 			int indexCategory  = new Random().nextInt(categories.size());
 			Film film = new Film();
@@ -161,20 +161,27 @@ public class CinemaInitServiceImpl implements ICinemaInitService {
 		List<Seance> seances = seanceRep.findAll();
 		 
 		double[] prices = new double[] {10,12 ,15,20 , 25} ;
+		List<Film> films = filmRep.findAll();
+		
 		villeRepo.findAll().forEach(ville->{
 			ville.getCinemas().forEach(cinema->{
 				cinema.getSalles().forEach(salle->{
-					filmRep.findAll().forEach(film->{
-						int indexSeance  = new Random().nextInt(seances.size());
+					int index = new Random().nextInt(films.size());
+					Film film = films.get(index);
+					 
+						//int indexSeance  = new Random().nextInt(seances.size());
 						int indePrice = new Random().nextInt(prices.length);
-						Projection projection = new Projection();
+						seanceRep.findAll().forEach(seance->{
+							Projection projection = new Projection();
 						projection.setFilm(film);
 						projection.setSalle(salle);
-						projection.setSeance(seances.get(indexSeance));
+						projection.setSeance(seance);
 						projection.setDateProjection(new Date());
 						projection.setPrix(prices[indePrice]);
 						projectionRep.save(projection);
-					});
+						});
+						
+					 
 				});
 			});
 		});
